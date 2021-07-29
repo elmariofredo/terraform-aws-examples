@@ -201,7 +201,7 @@ resource "aws_iam_group_policy" "aditlogs_read" {
       {
         Sid = "ListBucket"
         Resource = [
-          "${aws_s3_bucket.audit_log.arn}",
+          aws_resourcegroups_group.tools.arn,
         ]
         Effect = "Allow"
         Action = [
@@ -211,7 +211,7 @@ resource "aws_iam_group_policy" "aditlogs_read" {
       {
         Sid = "Read"
         Resource = [
-          "${aws_s3_bucket.audit_log.arn}/*",
+          "${aws_resourcegroups_group.tools.arn}/*",
         ]
         Effect = "Allow"
         Action = [
