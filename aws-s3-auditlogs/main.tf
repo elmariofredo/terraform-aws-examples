@@ -22,23 +22,3 @@ provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
 }
-
-resource "aws_s3_bucket" "rossumai_audit_log_bucket" {
-  bucket = "rossumai-audit-log-bucket"
-  acl    = "log-delivery-write"
-}
-
-resource "aws_s3_bucket" "bucket-test1" {
-  bucket = "tf-audit-test1-bucket"
-  acl    = "private"
-
-  tags = {
-    Name        = "Test bucket for auditing"
-    Environment = "Dev"
-  }
-
-  logging {
-    target_bucket = aws_s3_bucket.rossumai_audit_log_bucket.id
-    target_prefix = "log/"
-  }
-}
