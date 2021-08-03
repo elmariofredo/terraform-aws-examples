@@ -11,19 +11,6 @@ locals {
   execute_query_cmd = "aws athena start-query-execution --query-string file://${local.tmp_query_file} --output json --query-execution-context Database=${aws_athena_database.audit_log.id} --result-configuration OutputLocation=s3://${aws_s3_bucket.audit_log.id}/athena"
 }
 
-resource "aws_s3_bucket" "audit_log" {
-  bucket = var.auditlog_bucket_name
-  acl    = "log-delivery-write"
-}
-
-resource "aws_s3_bucket_public_access_block" "audit_log" {
-  bucket                  = aws_s3_bucket.audit_log.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
 resource "aws_athena_database" "audit_log" {
   name          = var.database_name
   bucket        = "${aws_s3_bucket.audit_log.id}/athena"
