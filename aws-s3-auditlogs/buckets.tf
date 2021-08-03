@@ -1,62 +1,41 @@
-
-resource "aws_s3_bucket" "audit_log" {
-  bucket = "audit-log-bucket.org.vejlupek"
-  acl    = "log-delivery-write"
+locals {
+  auditlog_bucket_name = "audit-log-bucket.org.vejlupek"
 }
 
+module "aws_auditlog" {
+  source                = "../tf/modules/aws_auditlog"
 
-resource "aws_s3_bucket_public_access_block" "audit_log" {
-  bucket                  = aws_s3_bucket.audit_log.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  table_name            = "test"
+  auditlog_bucket_name  = local.auditlog_bucket_name
+  read_users            = [
+    aws_iam_user.test_appslogs.name,
+    aws_iam_user.test_tools_write.name,
+  ]
 }
 
-resource "aws_s3_bucket" "some_awesome_tool" {
-  bucket = "some-awesome-tool.org.vejlupek"
-  acl    = "private"
+module "aws_s3_bucket_base_some_awesome_tool" {
+  source      = "../tf/modules/aws_s3_bucket_base"
 
-  tags = {
-    Name        = "Test bucket for auditing"
-    Environment = "Dev"
-    Kind        = "Tools"
-  }
-
-  logging {
-    target_bucket = aws_s3_bucket.audit_log.id
-    target_prefix = "log/some-awesome-tool.org.vejlupek/"
-  }
+  bucket      = "some-awesome-tool.org.vejlupek"
+  description = "Awesome tool data"
+  environment = "Dev"
+  type        = "ToolsData"
+  read_users  = [
+    aws_iam_user.test_tools_write.name,
+  ]
+  auditlog_bucket_id  = local.auditlog_bucket_name
 }
 
-resource "aws_s3_bucket_public_access_block" "some_awesome_tool" {
-  bucket                  = aws_s3_bucket.some_awesome_tool.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+module "aws_s3_bucket_base_fluentbit-logs" {
+  source      = "../tf/modules/aws_s3_bucket_base"
+
+  bucket      = "fluentbit-logs.logging.org.vejlupek"
+  description = "Test bucket for auditing"
+  environment = "Dev"
+  type        = "AppLogs"
+  write_users = [
+    aws_iam_user.test_appslogs.name,
+  ]
+  auditlog_bucket_id  = local.auditlog_bucket_name
 }
 
-resource "aws_s3_bucket" "fluentbit-logs" {
-  bucket = "fluentbit-logs.logging.org.vejlupek"
-  acl    = "private"
-
-  tags = {
-    Name        = "Test bucket for auditing"
-    Environment = "Dev"
-    Kind        = "Apps"
-  }
-
-  logging {
-    target_bucket = aws_s3_bucket.audit_log.id
-    target_prefix = "log/fluentbit-logs.logging.org.vejlupek/"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "fluentbit-logs" {
-  bucket                  = aws_s3_bucket.fluentbit-logs.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
