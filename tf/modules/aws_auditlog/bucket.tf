@@ -1,9 +1,9 @@
-resource "aws_s3_bucket" "audit_log" {
-  bucket = var.auditlog_bucket_name
+resource "aws_s3_bucket" "bucket" {
+  bucket = var.name
   acl    = "log-delivery-write"
 
   lifecycle_rule {
-    
+
     id      = "log"
     enabled = true
 
@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "audit_log" {
 }
 
 resource "aws_s3_bucket_public_access_block" "audit_log" {
-  bucket                  = aws_s3_bucket.audit_log.id
+  bucket                  = aws_s3_bucket.bucket.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true

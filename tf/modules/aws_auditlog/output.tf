@@ -1,5 +1,5 @@
-output "auditlog_bucket" {
-  value = aws_s3_bucket.audit_log
+output "bucket" {
+  value = aws_s3_bucket.bucket
 }
 
 output "auditlog_athena_database_name" {

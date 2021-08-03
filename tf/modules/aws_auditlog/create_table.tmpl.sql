@@ -30,4 +30,4 @@ WITH SERDEPROPERTIES (
 ) STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat'
 OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
-  's3://${auditlog_bucket_name}/log/'
+  's3://${audit_log_bucket_name}/log/'

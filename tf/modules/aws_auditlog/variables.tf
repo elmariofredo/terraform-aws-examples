@@ -1,4 +1,4 @@
-variable "auditlog_bucket_name" {
+variable "name" {
   type = string
   description = "Auditlog bucket name"
 }

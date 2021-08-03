@@ -1,7 +1,7 @@
 
 resource "aws_iam_group" "aditlogs_read" {
   count = length(var.read_users) == 0 ? 0 : 1
-  
+
   name = "aditlogs_read"
 }
 
@@ -36,7 +36,7 @@ resource "aws_iam_group_policy" "aditlogs_read" {
       {
         Sid = "ListBucket"
         Resource = [
-          "${aws_s3_bucket.audit_log.arn}",
+          "${aws_s3_bucket.bucket.arn}",
         ]
         Effect = "Allow"
         Action = [
@@ -46,7 +46,7 @@ resource "aws_iam_group_policy" "aditlogs_read" {
       {
         Sid = "Read"
         Resource = [
-          "${aws_s3_bucket.audit_log.arn}/*",
+          "${aws_s3_bucket.bucket.arn}/*",
         ]
         Effect = "Allow"
         Action = [
