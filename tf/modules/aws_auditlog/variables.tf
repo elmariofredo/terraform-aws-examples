@@ -1,5 +1,5 @@
 variable "name" {
-  type = string
+  type        = string
   description = "Auditlog bucket name"
 }
 
@@ -16,7 +16,7 @@ variable "table_name" {
 }
 
 variable "read_users" {
-  type        = list
+  type        = list(string)
   default     = []
   description = "Users with auditlog read access"
 }

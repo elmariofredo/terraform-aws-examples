@@ -2,7 +2,7 @@ module "aws_auditlog" {
   source                = "../tf/modules/aws_auditlog"
 
   name                  = "audit-log-bucket.org.vejlupek"
-  
+
   read_users            = [
     aws_iam_user.test_appslogs.name,
     aws_iam_user.test_tools_write.name,
@@ -19,7 +19,7 @@ module "aws_s3_bucket_base_some_awesome_tool" {
   read_users          = [
     aws_iam_user.test_tools_write.name,
   ]
-  auditlog_bucket_id  = module.aws_auditlog.bucket.id
+  auditlog_bucket_name  = module.aws_auditlog.bucket.id
 }
 
 module "aws_s3_bucket_base_fluentbit-logs" {
@@ -32,6 +32,6 @@ module "aws_s3_bucket_base_fluentbit-logs" {
   write_users         = [
     aws_iam_user.test_appslogs.name,
   ]
-  auditlog_bucket_id  = module.aws_auditlog.bucket.id
+  auditlog_bucket_name  = module.aws_auditlog.bucket.id
 }
 

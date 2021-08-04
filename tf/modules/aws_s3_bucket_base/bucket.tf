@@ -8,19 +8,36 @@ resource "aws_s3_bucket" "bucket" {
     Type        = var.type
   }
 
-  dynamic "logging" {
-    for_each = var.auditlog_bucket_id == "" ? [] : [1]
-    content {
-      target_bucket = var.auditlog_bucket_id
-      target_prefix = "log/${var.bucket}/"
+  lifecycle_rule {
+    id      = "expiration"
+    enabled = (var.lifecycle_expiration_days != null)
+
+    expiration {
+      days = var.lifecycle_expiration_days
     }
+  }
+
+  lifecycle_rule {
+    id      = "noncurrent_version_expiration"
+    enabled = true
+
+    noncurrent_version_expiration {
+      days = var.lifecycle_noncurrent_version_expiration_days
+    }
+  }
+
+  versioning {
+    enabled = true
+  }
+
+  logging {
+    target_bucket = var.auditlog_bucket_name
+    target_prefix = "log/${var.bucket}/"
   }
 
 }
 
 resource "aws_s3_bucket_public_access_block" "bucket" {
-  count                   = var.public_access ? 0 : 1
-
   bucket                  = aws_s3_bucket.bucket.id
   block_public_acls       = true
   block_public_policy     = true

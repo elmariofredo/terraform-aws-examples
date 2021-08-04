@@ -1,6 +1,6 @@
 locals {
-  tmp_query_file    = "/tmp/tf-${aws_s3_bucket.bucket.id}-create-audit-table.sql"
-  tmp_query_string  = templatefile(
+  tmp_query_file = "/tmp/tf-${aws_s3_bucket.bucket.id}-create-audit-table.sql"
+  tmp_query_string = templatefile(
     "${path.module}/create_table.tmpl.sql",
     {
       database_name         = var.database_name,

@@ -8,7 +8,7 @@ resource "aws_iam_group" "aditlogs_read" {
 resource "aws_iam_group_membership" "aditlogs_read" {
   count = length(var.read_users) == 0 ? 0 : 1
 
-  name  = "aditlogs_read"
+  name = "aditlogs_read"
 
   users = var.read_users
 
