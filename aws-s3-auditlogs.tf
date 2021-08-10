@@ -3,7 +3,7 @@ resource "aws_kms_key" "dev" {
 }
 
 module "aws_auditlog" {
-  source = "../tf/modules/aws_auditlog"
+  source = "./modules/aws_auditlog"
 
   name = "audit-log-bucket.org.vejlupek"
   read_users = [
@@ -14,7 +14,7 @@ module "aws_auditlog" {
 }
 
 module "aws_s3_bucket_base_some_awesome_tool" {
-  source = "../tf/modules/aws_s3_bucket_base"
+  source = "./modules/aws_s3_bucket_base"
 
   auditlog_bucket_name = module.aws_auditlog.bucket.id
   bucket               = "some-awesome-tool.org.vejlupek"
@@ -25,7 +25,7 @@ module "aws_s3_bucket_base_some_awesome_tool" {
 }
 
 module "aws_s3_bucket_base_fluentbit-logs" {
-  source = "../tf/modules/aws_s3_bucket_base"
+  source = "./modules/aws_s3_bucket_base"
 
   auditlog_bucket_name = module.aws_auditlog.bucket.id
   bucket               = "fluentbit-logs.logging.org.vejlupek"
