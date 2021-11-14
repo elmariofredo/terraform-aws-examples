@@ -3,7 +3,7 @@ resource "aws_kms_key" "dev" {
 }
 
 module "aws_auditlog" {
-  source = "./modules/aws_auditlog"
+  source = "../modules/aws_auditlog"
 
   name = "audit-log-bucket.org.vejlupek"
   read_users = [

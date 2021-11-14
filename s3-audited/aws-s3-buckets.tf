@@ -1,5 +1,5 @@
 module "aws_s3_bucket_base_some_awesome_tool" {
-  source = "./modules/aws_s3_bucket_base"
+  source = "../modules/aws_s3_bucket_base"
 
   auditlog_bucket_name = module.aws_auditlog.bucket.id
   bucket               = "some-awesome-tool.org.vejlupek"
@@ -10,7 +10,7 @@ module "aws_s3_bucket_base_some_awesome_tool" {
 }
 
 module "aws_s3_bucket_base_fluentbit-logs" {
-  source = "./modules/aws_s3_bucket_base"
+  source = "../modules/aws_s3_bucket_base"
 
   auditlog_bucket_name = module.aws_auditlog.bucket.id
   bucket               = "fluentbit-logs.logging.org.vejlupek"

@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "bucket" {
       storage_class = var.lifecycle_rule_transition_storage_class
     }
   }
-  # KMS encryption is not used for this bucket, no reqired for the content.
+  # KMS encryption is not used for main bucket, no reqired for the content.
 }
 
 resource "aws_s3_bucket_public_access_block" "bucket" {
