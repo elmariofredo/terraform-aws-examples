@@ -1,9 +1,12 @@
 
 locals {
   kube_config_path = "tmp/${var.name}-kubeconfig.yml"
-  ingress_class    = "nginx"
-  domain_suffix    = "${var.name}.${var.domain}"
-  rancher_domain   = "rancher.${local.domain_suffix}"
+#   domain_suffix    = "${var.name}.${var.domain}"
+#   rancher_domain   = "rancher.${local.domain_suffix}"
+}
+
+module "aws_default_vpc" {
+  source = "../../modules/aws_default_vpc"
 }
 
 # https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
@@ -12,7 +15,7 @@ resource "aws_eks_cluster" "main" {
   role_arn = aws_iam_role.main.arn
 
   vpc_config {
-    subnet_ids = var.subnet_ids
+    subnet_ids = module.aws_default_vpc.subnet_ids
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
@@ -29,7 +32,7 @@ resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "main"
   node_role_arn   = aws_iam_role.node_group.arn
-  subnet_ids      = var.subnet_ids
+  subnet_ids      = module.aws_default_vpc.subnet_ids
   instance_types  = var.node_group_instance_types
 
   scaling_config {
@@ -97,122 +100,4 @@ resource "local_file" "kube_config" {
   })
   filename = local.kube_config_path
 
-  depends_on = [
-    aws_eks_node_group.main,
-  ]
-}
-
-# data "tls_certificate" "main" {
-#   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
-# }
-
-# resource "aws_iam_openid_connect_provider" "main" {
-#   url            = aws_eks_cluster.main.identity[0].oidc[0].issuer
-#   client_id_list = ["sts.amazonaws.com"]
-#   thumbprint_list = [
-#     data.tls_certificate.main.certificates.0.sha1_fingerprint
-#   ]
-# }
-
-module "ingress_nginx" {
-  source                   = "../../modules/ingress_nginx"
-  controller_ingress_class = local.ingress_class
-
-  depends_on = [
-    # aws_iam_openid_connect_provider.main,
-    # helm_release.lb_controller,
-    # aws_eks_cluster.main
-    local_file.kube_config,
-  ]
-}
-
-module "k8s_dns" {
-  source = "../../modules/k8s_dns"
-
-  domain                        = var.domain
-  instance_name                 = var.name
-  ingress_loadbalancer_hostname = module.ingress_nginx.lb_hostname
-}
-
-module "cert_manager" {
-  source = "../../modules/cert_manager"
-
-  # kube_config_path  = local.kube_config_path
-  letsencrypt_email = var.letsencrypt_email
-  ingress_class     = local.ingress_class
-
-  depends_on = [
-    module.k8s_dns,
-    module.ingress_nginx,
-  ]
-
-}
-
-
-resource "random_password" "rancher_bootstrap_password" {
-  length           = 16
-  special          = true
-  override_special = "_"
-}
-
-module "rancher" {
-  source             = "../../modules/rancher"
-  rancher_domain     = local.rancher_domain
-  letsencrypt_email  = var.letsencrypt_email
-  ingress_class      = local.ingress_class
-  bootstrap_password = random_password.rancher_bootstrap_password.result
-
-  depends_on = [
-    module.cert_manager
-  ]
-}
-
-# TODO: rename to rancher_bootsrap_password
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "_"
-}
-
-resource "rancher2_bootstrap" "main" {
-  initial_password = random_password.rancher_bootstrap_password.result
-  password         = random_password.password.result
-  provider         = rancher2.bootstrap
-
-  depends_on = [
-    module.rancher,
-  ]
-}
-
-module "argocd" {
-  source = "../../modules/argocd"
-
-  argocd_domain = "argocd.${local.domain_suffix}"
-  ingress_class = local.ingress_class
-
-  depends_on = [
-    module.ingress_nginx,
-  ]
-}
-
-module "rancher_monitoring_local" {
-  source = "../../modules/rancher_monitoring"
-
-  cluster_id = "local"
-
-  providers = {
-    rancher2 = rancher2.main
-  }
-
-  depends_on = [
-    rancher2_bootstrap.main,
-  ]
-}
-
-module "sealed_secrets" {
-  source = "../../modules/sealed_secrets"
-
-  depends_on = [
-    module.ingress_nginx,
-  ]
 }

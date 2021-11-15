@@ -13,11 +13,6 @@ resource "helm_release" "rancher" {
       tls      = var.tls
       hostname = var.rancher_domain
       ingress = {
-        # extraAnnotations = {
-          # "kubernetes.io/ingress.class" = var.ingress_class
-          # "cert-manager.io/cluster-issuer"= "letsencrypt"
-          # "projectcontour.io/websocket-routes" = "/"
-        # }
         tls = {
           source = "letsEncrypt"
         }

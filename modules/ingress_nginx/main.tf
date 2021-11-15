@@ -40,4 +40,10 @@ data "kubernetes_service" "ingress" {
     name = "ingress-nginx-controller"
     namespace = var.namespace
   }
+
+  depends_on = [
+    helm_release.ingress
+  ]
 }
+
+

@@ -1,3 +1,7 @@
+locals {
+  user = "admin"
+}
+
 resource "random_password" "main" {
   length  = 16
   special = true
