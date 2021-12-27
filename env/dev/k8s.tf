@@ -1,10 +1,3 @@
-locals {
-  name          = "prod"
-  domain        = "k8s.vejlupek.online"
-  nodes_desired = 2
-  nodes_max     = 2
-}
-
 module "aws_eks" {
   source = "../../modules/aws_eks"
 
@@ -20,6 +13,10 @@ module "k8s_base_bootstrap" {
   name              = local.name
   domain            = local.domain
   letsencrypt_email = var.email
+
+  depends_on = [
+    module.aws_eks
+  ]
 }
 
 
@@ -38,5 +35,33 @@ module "k8s_base" {
   domain            = local.domain
   letsencrypt_email = var.email
 
+  # dependency_check = null_resource.state
+  depends_on_check = module.k8s_base_bootstrap.ready
+
 }
 
+output "rancher_url" {
+  value = module.k8s_base.rancher_url
+}
+
+output "rancher_user" {
+  value = module.k8s_base.rancher_user
+}
+
+output "rancher_password" {
+  value = module.k8s_base.rancher_password
+  sensitive = true
+}
+
+output "argo_url" {
+  value = module.k8s_base.argo_url
+}
+
+output "argo_user" {
+  value = module.k8s_base.argo_user
+}
+
+output "argo_password" {
+  value = module.k8s_base.argo_password
+  sensitive = true
+}

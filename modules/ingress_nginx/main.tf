@@ -29,6 +29,16 @@ resource "helm_release" "ingress" {
           enabled = true
           default = true
         }
+        service = {
+          # externalTrafficPolicy = "Local" https://github.com/kubernetes/ingress-nginx/issues/6263
+          annotations = {
+            "service.beta.kubernetes.io/aws-load-balancer-proxy-protocol" = "*"
+          }
+        }
+        config = {
+          "use-proxy-protocol": "true"
+          "forwarded-for-header": "true"
+        }
       }
     }),
     yamlencode(var.values)
