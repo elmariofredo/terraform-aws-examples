@@ -3,7 +3,7 @@ variable "parent_dns_zone" {
   type        = any
 }
 
-variable "domain_prefix" {
-  description = "Domain prefix"
+variable "name" {
+  description = "Environment name"
   type        = string
 }
